@@ -1,1 +1,1 @@
-# My Gulp file for wordpress development - Nelson Jeronimo
+# My Gulp files for wordpress development - Nelson Jeronimo
