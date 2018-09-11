@@ -64,3 +64,4 @@ typings/
 src
 dist
 .vscode
+_gulpfile.js

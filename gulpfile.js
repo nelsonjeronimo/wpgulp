@@ -26,7 +26,7 @@ gulp.task('sass', function() {
     var theme = gulp.src(dir.src+'theme/assets/scss/**/*.scss')
                 .pipe(sass().on('error', sass.logError))
                 .pipe(sourcemaps.init())
-                .pipe(autoprefixer() )
+                .pipe( autoprefixer())
                 .pipe(cleanCSS({compatibility: 'ie9'}))
                 .pipe(sourcemaps.write())
                 .pipe(gulp.dest(dir.dist+'theme/assets/css'));
