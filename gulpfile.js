@@ -7,6 +7,7 @@ var cleanCSS = require('gulp-clean-css');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
 var imagemin = require('gulp-imagemin');
+var newer = require('gulp-newer');
 var merge = require('merge-stream');
 var browserSync = require('browser-sync').create();
 
@@ -21,83 +22,60 @@ const
 var projectURL  =   'project.test';
 
 // SASS to CSS, minified, cleaned, sourcemapped, autoprefixed
+
+var sass = {
+    opts: {
+        outputStyle     : 'nested',
+        imagePath       : images.build,
+        precision       : 3,
+        errLogToConsole : true        
+    }
+}
 gulp.task('sass', function() {
 
-    var theme = gulp.src(dir.src+'theme/assets/scss/**/*.scss')
-                .pipe(sass().on('error', sass.logError))
-                .pipe(sourcemaps.init())
-                .pipe( autoprefixer())
-                .pipe(cleanCSS({compatibility: 'ie9'}))
-                .pipe(sourcemaps.write())
-                .pipe(gulp.dest(dir.dist+'theme/assets/css'));
-    
-    var plugin = gulp.src(dir.src+'plugin/assets/scss/**/*.scss')
-                .pipe(sass().on('error', sass.logError))
-                .pipe(sourcemaps.init())
-                .pipe( autoprefixer() )
-                .pipe(cleanCSS({compatibility: 'ie9'}))
-                .pipe(sourcemaps.write())
-                .pipe(gulp.dest(dir.dist+'plugin/assets/css'));
-
-    return merge(theme, plugin);
-
+   return gulp.src(dir.src+'assets/scss/**/*.scss')
+            .pipe(sass(sass.opts).on('error', sass.logError))
+            .pipe(sourcemaps.init())
+            .pipe( autoprefixer())
+            .pipe(cleanCSS({compatibility: 'ie9'}))
+            .pipe(sourcemaps.write())
+            .pipe(gulp.dest(dir.dist+'assets/css'));
 });
 
 // JS minify
 gulp.task('js', function() {
-
-    var theme = gulp.src(dir.src+'theme/assets/js/**/*.js')
-                .pipe(uglify())
-                .pipe(gulp.dest(dir.dist+'theme/assets/js'));
-
-    var plugin = gulp.src(dir.src+'plugin/assets/js/**/*.js')
-                .pipe(uglify())
-                .pipe(gulp.dest(dir.dist+'plugin/assets/js'));
-    
-    return merge(theme, plugin);
+    return gulp.src(dir.src+'assets/js/**/*.js')
+            .pipe(uglify())
+            .pipe(gulp.dest(dir.dist+'assets/js'));
 });
 
 // Compress Images
 gulp.task('images', function() {
-
-    var theme = gulp.src(dir.src+'theme/assets/images/**/*.*')
-                .pipe(imagemin())
-                .pipe(gulp.dest(dir.dist+'theme/assets/images'));
-
-    var plugin = gulp.src(dir.src+'plugin/assets/images/**/*.*')
-                .pipe(imagemin())
-                .pipe(gulp.dest(dir.dist+'plugin/assets/images'));
-    
-    return merge(theme, plugin);
+    return gulp.src(dir.src+'assets/images/**/*.*')
+            .pipe(newer(dis.dist+'assets/images/**/*'))
+            .pipe(imagemin())
+            .pipe(gulp.dest(dir.dist+'assets/images'));
 });
 
 // Fonts
 gulp.task('fonts', function() {
-
-    var theme = gulp.src(dir.src+'theme/assets/fonts/**/*.*')
-                .pipe(gulp.dest(dir.dist+'theme/assets/fonts'));
-
-    var plugin = gulp.src(dir.src+'plugin/assets/fonts/**/*.*')
-                .pipe(gulp.dest(dir.dist+'plugin/assets/fonts'));
-    
-    return merge(theme, plugin);
+    return gulp.src(dir.src+'assets/fonts/**/*.*')
+            .pipe(newer(dir.dist+'assets/fonts/'))
+            .pipe(gulp.dest(dir.dist+'assets/fonts'));
 });
 
 // Copy files
 gulp.task('files', function() {
-    var themeroot = gulp.src(dir.src+'theme/*.*')
-                    .pipe(gulp.dest(dir.dist+'theme/'));
+    var themeroot = gulp.src(dir.src+'*.*')
+                    .pipe(gulp.dest(dir.dist));
     
-    var themelang = gulp.src(dir.src+'theme/languages/**/*.*')
-                    .pipe(gulp.dest(dir.dist+'theme/languages/'));
-         
-    var pluginroot = gulp.src(dir.src+'plugin/*.*')
-                     .pipe(gulp.dest(dir.dist+'plugin/'));  
+    var themelang = gulp.src(dir.src+'languages/**/*.*')
+                    .pipe(gulp.dest(dir.dist+'languages/'));
 
-    var pluginlang = gulp.src(dir.src+'plugin/languages/**/*.*')
-                     .pipe(gulp.dest(dir.dist+'plugin/languages/'));
+    var phpfiles = gulp.src(dir.src+'**/*.php')
+                    .pipe(gulp.dest(dir.dist));
     
-    return merge(themeroot, pluginroot, themelang, pluginlang);
+    return merge(themeroot, themelang, phpfiles);
 });
 
 // Browsersync
